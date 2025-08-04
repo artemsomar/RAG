@@ -1,15 +1,15 @@
-
-from src.bm25.tokenizator import Tokenizator
 from src.dataset_loader import DatasetLoader
+from src.bm25.bm25_search import BM25
 import nltk
 nltk.download('punkt_tab')
 
 def main():
     data_loader = DatasetLoader()
     df = data_loader.load()
-    tokenizator = Tokenizator(df)
-    tokenized_corpus = tokenizator.load_tokenized_corpus()
-    return tokenized_corpus
+    
+    bm25 = BM25(df)
+    best_article, _ = bm25.search_best("How neural networks are used for text classification")
+    print(best_article)
 
 if __name__ == "__main__":
     main()

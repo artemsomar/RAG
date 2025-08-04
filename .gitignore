@@ -2,10 +2,8 @@ __pycache__/
 
 venv/
 
-*.pkl
-*.pickle
-*.csv
-*.json
+data/*
+!data/.gitkeep
 
 .DS_Store
 Thumbs.db

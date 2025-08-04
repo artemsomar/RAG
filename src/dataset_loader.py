@@ -2,7 +2,7 @@ from datasets import load_dataset, Dataset
 from pathlib import Path
 import pandas as pd
 
-class DatasetLoader():
+class DatasetLoader:
 
     def __init__(self, dataset_name = "pt-sk/research_papers_short", data_dir = "./data"):
         self.dataset_name = dataset_name

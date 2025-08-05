@@ -3,3 +3,4 @@ torch
 nltk
 rank-bm25
 datasets
+tf-keras

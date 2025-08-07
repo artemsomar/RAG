@@ -4,3 +4,5 @@ nltk
 rank-bm25
 datasets
 tf-keras
+python-dotenv
+huggingface_hub

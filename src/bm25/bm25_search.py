@@ -13,6 +13,7 @@ class BM25:
         doc_scores = bm25.get_scores(tokenized_query)
 
         best_index = int(doc_scores.argmax())
+        quote = f"{self.df[best_index]['title']} [{best_index}]"
         best_abstract = self.df[best_index]['abstract']
 
-        return best_abstract, best_index
+        return best_abstract, quote

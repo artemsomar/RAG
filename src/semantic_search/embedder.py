@@ -19,7 +19,7 @@ class Embedder:
             return corpus
 
     def embed_query(self, query):
-        return self.model.encode(query, convert_to_tensor=True)
+        return self.model.encode(query, convert_to_numpy=True)
 
     def _embed_and_save(self):
         texts = [f"{x['title']}\t{x['abstract']}" for x in self.df]

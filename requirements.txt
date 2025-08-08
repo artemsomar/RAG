@@ -6,3 +6,4 @@ datasets
 tf-keras
 python-dotenv
 huggingface_hub
+scikit-learn

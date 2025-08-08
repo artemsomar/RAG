@@ -25,10 +25,12 @@ class Embedder:
         texts = [f"{x['title']}\t{x['abstract']}" for x in self.df]
         print("Embedding text...")
         embedded_corpus = self.model.encode(texts, convert_to_tensor=True)
+        embedded_corpus_numpy = embedded_corpus.cpu().numpy()
 
         Path(self.path_to_file).parent.mkdir(parents=True, exist_ok=True)
         with open(self.path_to_file, "wb") as f:
-            pickle.dump(embedded_corpus, f)
+            pickle.dump(embedded_corpus_numpy, f)
+
         print("Embedded corputs was saved")
         
-        return embedded_corpus
+        return embedded_corpus_numpy

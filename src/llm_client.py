@@ -14,7 +14,7 @@ class LLMClient:
         self.df = df
 
     def do_request(self, query, use_bm25: bool = True, use_ss: bool = False):
-        prompt, sources = self._create_prompt(query, use_bm25, use_ss)
+        prompt, source = self._create_prompt(query, use_bm25, use_ss)
     
         completion = self.client.chat.completions.create(
             model=self.model,
@@ -29,32 +29,21 @@ class LLMClient:
                 }
             ]
         )
-        
-        result = completion.choices[0].message.content
-        for source in sources:
-            result += source
-            
+        result = completion.choices[0].message.content + source
         return result
 
-
     def _create_prompt(self, query, use_bm25, use_ss):
-        knowledge_base = []
-        sources = []
+        
+        quote = ""
         if use_bm25:
-            abstract, quote = self._get_bm25_result(query)
-            knowledge_base.append(abstract)
-            sources.append(quote)
+            abstract, quote = self._get_bm25_result(query)  
         if use_ss:
             abstract, quote = self._get_ss_result(query)
-            knowledge_base.append(abstract)
-            sources.append(quote)
-
-        context = "\n\n".join(knowledge_base)
         
-        if knowledge_base:
+        if use_bm25 or use_ss:
             prompt = f"""
             Considering the following information from scientific abstracts:
-            {context}
+            {abstract}
         
             Give answer for this question:
             {query}
@@ -65,9 +54,7 @@ class LLMClient:
             {query}
             """
             
-        return prompt, sources
-
-
+        return prompt, quote
 
     def _get_bm25_result(self, query):
         bm25 = BM25(self.df)
@@ -82,6 +69,7 @@ class LLMClient:
     def _connect_to_client(self):
         client = InferenceClient(
             model = self.model,
+            provider = "novita",
             api_key = os.getenv("HF_TOKEN"),
         )
         return client

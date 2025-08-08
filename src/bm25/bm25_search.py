@@ -13,7 +13,16 @@ class BM25:
         doc_scores = bm25.get_scores(tokenized_query)
 
         best_index = int(doc_scores.argmax())
-        quote = f"{self.df[best_index]['title']} [{best_index}]"
+        quote = f" [{best_index}] {self.df[best_index]['title']} "
         best_abstract = self.df[best_index]['abstract']
 
         return best_abstract, quote
+    
+    def get_all_scores(self, query):
+        tokenizator = Tokenizator(self.df)
+        tokenized_corpus =  tokenizator.load_tokenized_corpus()
+        bm25 = BM25Okapi(tokenized_corpus)
+        tokenized_query = tokenizator.tokenize_query(query)
+        doc_scores = bm25.get_scores(tokenized_query)
+
+        return doc_scores

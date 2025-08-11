@@ -1,5 +1,5 @@
 from sklearn.preprocessing import minmax_scale
-from src.rag import BM25, SemanticSearch
+from src.rag.rag_methods import SemanticSearch, BM25
 
 
 class HybridSearch:
@@ -19,4 +19,3 @@ class HybridSearch:
         best_abstract = self.df[best_index]['abstract']
 
         return best_abstract, quote
-

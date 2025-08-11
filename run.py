@@ -1,10 +1,6 @@
 from src.dataset_loader import DatasetLoader
 from src.llm_client import LLMClient
 
-import nltk
-nltk.download('punkt_tab')
-
-
 def main():
     data_loader = DatasetLoader()
     df = data_loader.load()
@@ -14,7 +10,7 @@ def main():
 
     llm = LLMClient(model)
 
-    print(llm.do_request_with_rag(query, df, method="bm25"))
+    print(llm.do_request_with_rag(query, df, method="semantic"))
   
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 from sentence_transformers import util
-from src.rag.semantic_search.embedder import Embedder
+from src.rag.text_processing.embedding_processor import EmbeddingProcessor
 
 
 class SemanticSearch:
@@ -7,9 +7,9 @@ class SemanticSearch:
         self.df = df
 
     def search_best(self, query):
-        embedder = Embedder(self.df)
-        embedded_query = embedder.embed_query(query)
-        embedded_corpus = embedder.loaded_embedded_corpus()
+        embedder = EmbeddingProcessor()
+        embedded_query = embedder.get_embedded_query(query)
+        embedded_corpus = embedder.get_embedded_corpus(self.df)
         cor_scores = util.pytorch_cos_sim(embedded_query, embedded_corpus)[0]
 
         best_index = int(cor_scores.argmax()) 
@@ -19,11 +19,9 @@ class SemanticSearch:
         return best_abstract, quote
     
     def get_all_scores(self, query):
-        embedder = Embedder(self.df)
-        embedded_query = embedder.embed_query(query)
-        embedded_corpus = embedder.loaded_embedded_corpus()
+        embedder = EmbeddingProcessor()
+        embedded_query = embedder.get_embedded_query(query)
+        embedded_corpus = embedder.get_embedded_corpus(self.df)
         cor_scores = util.pytorch_cos_sim(embedded_query, embedded_corpus)[0].cpu().numpy()
 
         return cor_scores
-    
-    

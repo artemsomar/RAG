@@ -1,4 +1,4 @@
-from src.rag import BM25, SemanticSearch, HybridSearch
+from src.rag.rag_methods import BM25, SemanticSearch, HybridSearch
 
 class RagController:
     def __init__(self, df):
@@ -22,16 +22,19 @@ class RagController:
     def __get_bm25(self):
         if "bm25" not in self.__instances:
             self.__instances["bm25"] = BM25(self.df)
+            print("Created BM25")
         return self.__instances["bm25"]
 
     def __get_semantic(self):
         if "semantic" not in self.__instances:
             self.__instances["semantic"] = SemanticSearch(self.df)
+            print("Created SS")
         return self.__instances["semantic"]
 
     def __get_hybrid(self):
         if "hybrid" not in self.__instances:
             self.__instances["hybrid"] = HybridSearch(self.df)
+            print("Created Hybrid")
         return self.__instances["hybrid"]
 
     

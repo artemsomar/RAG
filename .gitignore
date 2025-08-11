@@ -1,6 +1,6 @@
 __pycache__/
 
-venv/
+.venv
 
 data/*
 !data/.gitkeep
@@ -8,3 +8,4 @@ data/*
 .DS_Store
 Thumbs.db
 .env
+.vscode

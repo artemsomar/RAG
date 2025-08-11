@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from src.rag.rag_controller import RagController
+from src.rag import RagController
 import os
 from huggingface_hub import InferenceClient
 

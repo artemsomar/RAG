@@ -3,7 +3,6 @@ import pickle
 from .base_processor import BaseProcessor
 from sentence_transformers import SentenceTransformer
 
-
 class EmbeddingProcessor(BaseProcessor):
     
     def __init__(self, default_path_to_file="data/embedded_corpus.pkl"):

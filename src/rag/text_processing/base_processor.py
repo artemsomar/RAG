@@ -1,5 +1,6 @@
 from pathlib import Path
 import pickle
+import nltk
 from nltk.corpus import stopwords
 import re
 
@@ -11,6 +12,7 @@ class BaseProcessor:
 
 
     def _preprocess_df(self, df):
+        nltk.download('stopwords')
         stop_words = set(stopwords.words("english"))
 
         texts = [f"{x['title']}\t{x['abstract']}" for x in df]

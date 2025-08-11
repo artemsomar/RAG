@@ -33,7 +33,7 @@ class EmbeddingProcessor(BaseProcessor):
 
     def __embed_df(self, df, path_to_file):
         
-        preprocessed_texts = self._preprocess_texts(df)
+        preprocessed_texts = self._preprocess_df(df)
         embedded_corpus = self.model.encode(preprocessed_texts, convert_to_tensor=True)
         embedded_corpus_numpy = embedded_corpus.cpu().numpy()
 

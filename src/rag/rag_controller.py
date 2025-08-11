@@ -1,5 +1,6 @@
 from src.rag.rag_methods import BM25, SemanticSearch, HybridSearch
 
+
 class RagController:
     def __init__(self, df):
             self.df = df

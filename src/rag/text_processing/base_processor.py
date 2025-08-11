@@ -4,7 +4,6 @@ from nltk.corpus import stopwords
 import re
 
 
-
 class BaseProcessor:
 
     def __init__(self, default_path_to_file):

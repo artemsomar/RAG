@@ -1,6 +1,5 @@
 from src.dataset_loader import DatasetLoader
 from src.llm_client import LLMClient
-from src.bm25_ss_search import Bm25SsSearch
 
 import nltk
 nltk.download('punkt_tab')
@@ -13,10 +12,10 @@ def main():
     model = "meta-llama/Llama-3.1-8B-Instruct"
     query = "How neural networks are used for text classification"
 
-    rag = Bm25SsSearch(df)
-    answer, quote = rag.search_best(query)
-    print(answer + quote)
-    
+    llm = LLMClient(model)
+
+    print(llm.do_request_with_rag(query, df, method="bm25"))
+  
 
 if __name__ == "__main__":
     main()

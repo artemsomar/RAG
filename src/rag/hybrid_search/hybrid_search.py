@@ -1,9 +1,8 @@
 from sklearn.preprocessing import minmax_scale
-from src.bm25.bm25_search import BM25
-from src.semantic_search.semantic_search import SemanticSearch
+from src.rag import BM25, SemanticSearch
 
 
-class Bm25SsSearch:
+class HybridSearch:
     def __init__(self, df):
         self.df = df
 

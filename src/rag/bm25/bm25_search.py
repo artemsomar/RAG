@@ -1,5 +1,6 @@
-from src.bm25.tokenizator import Tokenizator
+
 from rank_bm25 import BM25Okapi
+from src.rag.bm25.tokenizator import Tokenizator
 
 class BM25:
     def __init__(self, df):

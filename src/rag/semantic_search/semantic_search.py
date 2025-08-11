@@ -1,5 +1,5 @@
 from sentence_transformers import util
-from src.semantic_search.embedder import Embedder
+from src.rag.semantic_search.embedder import Embedder
 
 
 class SemanticSearch:

@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
-from src.bm25.bm25_search import BM25
-from src.semantic_search.semantic_search import SemanticSearch
+from src.rag.rag_controller import RagController
 import os
 from huggingface_hub import InferenceClient
 
@@ -8,14 +7,27 @@ load_dotenv()
 
 class LLMClient:
 
-    def __init__(self, model, df):
+    def __init__(self, model):
         self.model = model 
-        self.client = self._connect_to_client()
-        self.df = df
+        self.client = self.__connect_to_client()
 
-    def do_request(self, query, use_bm25: bool = True, use_ss: bool = False):
-        prompt, source = self._create_prompt(query, use_bm25, use_ss)
+    def do_request_with_rag(self, query: str, df, method: str):
+
+        rag_controller = RagController(df)
+        abstract, source = rag_controller.search_best(query, method)
+
+        prompt = f"""
+        Considering the following information from scientific abstract:
+        {abstract}
     
+        Give answer for this question:
+        {query}
+        """
+
+        result = self.do_request(prompt) + source
+        return result
+
+    def do_request(self, prompt):
         completion = self.client.chat.completions.create(
             model=self.model,
             messages=[
@@ -29,44 +41,10 @@ class LLMClient:
                 }
             ]
         )
-        result = completion.choices[0].message.content + source
+        result = completion.choices[0].message.content
         return result
 
-    def _create_prompt(self, query, use_bm25, use_ss):
-        
-        quote = ""
-        if use_bm25:
-            abstract, quote = self._get_bm25_result(query)  
-        if use_ss:
-            abstract, quote = self._get_ss_result(query)
-        
-        if use_bm25 or use_ss:
-            prompt = f"""
-            Considering the following information from scientific abstracts:
-            {abstract}
-        
-            Give answer for this question:
-            {query}
-            """
-        else:
-            prompt = f"""
-            Answer the following question without additional context:
-            {query}
-            """
-            
-        return prompt, quote
-
-    def _get_bm25_result(self, query):
-        bm25 = BM25(self.df)
-        abstract, quote = bm25.search_best(query)
-        return abstract, quote
-    
-    def _get_ss_result(self, query):
-        ss = SemanticSearch(self.df)
-        abstract, quote = ss.search_best(query)
-        return abstract, quote
-
-    def _connect_to_client(self):
+    def __connect_to_client(self):
         client = InferenceClient(
             model = self.model,
             provider = "novita",

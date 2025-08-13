@@ -10,7 +10,7 @@ def main():
 
     llm = LLMClient(model)
 
-    print(llm.do_request_with_rag(query, df, method="semantic"))
+    print(llm.do_request_with_rag(query, df, method="bm25"))
   
 
 if __name__ == "__main__":

@@ -9,3 +9,4 @@ data/*
 Thumbs.db
 .env
 .vscode
+.idea

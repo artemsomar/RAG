@@ -1,0 +1,29 @@
+import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from src.assistant.routers.llm_router import router as llm_router
+from src.assistant.routers.rag_router import router as rag_router
+from src.assistant.routers.llm_rag_router import router as llm_rag_router
+
+app = FastAPI(title="RAG API", version="1.0.0")
+app.include_router(llm_router, prefix="/llm", tags=["LLM"])
+app.include_router(rag_router, prefix="/rag", tags=["RAG"])
+app.include_router(llm_rag_router, prefix="/llm_rag", tags=["LLM+RAG"])
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+    "http://localhost:3000",
+    "http://localhost"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+def health_check():
+    return {"status": "OK"}
+
+if __name__ == "__main__":
+    uvicorn.run("src.app:app", host="127.0.0.1", port=8000, reload=True)

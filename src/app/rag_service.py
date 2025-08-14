@@ -14,7 +14,7 @@ class LLMService:
         self.rag_controller = RagController() 
 
 
-    async def do_request_with_rag(self, query: str, method: str) -> str:
+    def do_request_with_rag(self, query: str, method: str) -> str:
 
         abstract, source = self.rag_controller.search_best(query, method)
 

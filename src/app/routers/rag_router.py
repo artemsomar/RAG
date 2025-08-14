@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
-from api.modules.rag import QueryRequest, QueryResponse
-from api.services.llm import LLMService
+from app.rag_schemas import QueryRequest, QueryResponse
+from app.services.llm import LLMService
 
 router = APIRouter()
 
@@ -10,4 +10,4 @@ async def query_rag(request: QueryRequest, llm_service: LLMService = Depends()):
         query=request.query,
         method=request.method,
     )
-    return QueryResponse(answer=response)
+    return QueryResponse(response)

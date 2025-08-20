@@ -6,14 +6,14 @@ class BM25:
     def __init__(self, df):
         self.df = df
         self.tokenizer = TokenizingProcessor()
-        tokenized_corpus = self.tokenizer.get_tokenized_corpus(df)
-        self.bm25 = BM25Okapi(tokenized_corpus)
 
 
-    def search_best(self, query) -> tuple[str, str]:
+    async def search_best(self, query) -> tuple[str, str]:
 
-        tokenized_query = self.tokenizer.get_tokenized_query(query)
-        doc_scores = self.bm25.get_scores(tokenized_query)
+        tokenized_corpus = await self.tokenizer.get_tokenized_corpus(self.df)
+        bm25 = BM25Okapi(tokenized_corpus)
+        tokenized_query = await self.tokenizer.get_tokenized_query(query)
+        doc_scores = bm25.get_scores(tokenized_query)
 
         best_index = int(doc_scores.argmax())
         quote = f" [{best_index}] {self.df[best_index]['title']} "
@@ -22,9 +22,11 @@ class BM25:
         return best_abstract, quote
 
 
-    def get_all_scores(self, query):
+    async def get_all_scores(self, query):
 
-        tokenized_query = self.tokenizer.get_tokenized_query(query)
-        doc_scores = self.bm25.get_scores(tokenized_query)
+        tokenized_corpus = await self.tokenizer.get_tokenized_corpus(self.df)
+        bm25 = BM25Okapi(tokenized_corpus)
+        tokenized_query = await self.tokenizer.get_tokenized_query(query)
+        doc_scores = bm25.get_scores(tokenized_query)
 
         return doc_scores

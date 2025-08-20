@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import pickle
 import nltk
@@ -9,6 +10,7 @@ class BaseProcessor:
 
     def __init__(self, default_path_to_file):
         self.path_to_file = default_path_to_file
+        self._model = os.getenv("CO_MODEL")
 
 
     def _preprocess_df(self, df):

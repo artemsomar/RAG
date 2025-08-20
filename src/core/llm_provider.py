@@ -1,35 +1,21 @@
 import os
+import cohere
 from dotenv import load_dotenv
-from huggingface_hub import InferenceClient
 
 load_dotenv()
 
-SYSTEM_PROMPT = "You are a research assistant. Give accurate, short answers to the question asked."
 
 class LlmProvider:
 
     def __init__(self):
-        self.model = os.getenv("HF_MODEL")
-        self.provider = os.getenv("HF_PROVIDER")
-        self.api_key = os.getenv("HF_API_KEY")
-        self.client = self.__connect_to_client()
+        self.model = os.getenv("CO_MODEL")
+        self.api_key = os.getenv("CO_TOKEN")
+        self.client = cohere.AsyncClientV2(api_key=self.api_key)
 
 
-    def __connect_to_client(self) -> InferenceClient:
-        client = InferenceClient(
+    async def chat_completion(self, user_prompt: str) -> str:
+        completion = await self.client.chat(
             model=self.model,
-            provider=self.provider,
-            api_key=self.api_key,
+            messages=[cohere.UserChatMessageV2(content=user_prompt)],
         )
-        return client
-
-
-    def chat_completion(self, user_prompt: str) -> str:
-        completion = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
-                { "role": "system", "content": SYSTEM_PROMPT },
-                { "role": "user", "content": user_prompt }
-            ]
-        )
-        return completion.choices[0].message.content
+        return completion.message.content[0].text

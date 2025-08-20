@@ -1,16 +1,18 @@
+import os
 from pathlib import Path
 import pickle
+import cohere
 from .base_processor import BaseProcessor
-from sentence_transformers import SentenceTransformer
+
 
 class EmbeddingProcessor(BaseProcessor):
     
     def __init__(self, default_path_to_file="data/embedded_corpus.pkl"):
         super().__init__(default_path_to_file)
-        self.model = SentenceTransformer('all-MiniLM-L6-v2')
-        
+        self._cohere_async_v2 = cohere.AsyncClientV2(os.getenv("CO_TOKEN"))
+        self._embedding_model = os.getenv("CO_EMBEDDING_MODEL")
 
-    def get_embedded_corpus(self, df, path_to_file=None):
+    async def get_embedded_corpus(self, df, path_to_file=None):
 
         if path_to_file is None:
             path_to_file = self.path_to_file
@@ -22,20 +24,38 @@ class EmbeddingProcessor(BaseProcessor):
                 print("Loading embedded file")
                 return pickle.load(f)
         else:
-            corpus = self.__embed_df(df, path_to_file)
+            corpus = await self.__embed_df(df, path_to_file)
             return corpus
 
 
-    def get_embedded_query(self, query):
-        return self.model.encode(query, convert_to_numpy=True)
+    async def get_embedded_query(self, query):
+        embedded_quary_reult = await self._cohere_async_v2.embed(
+            texts=[query],
+            model=self._embedding_model,
+            input_type="search_query",
+            embedding_types=["float"],
+        )
+        embedded_quary = embedded_quary_reult.embeddings.float[0]
+        return embedded_quary
     
 
-    def __embed_df(self, df, path_to_file):
-        
-        preprocessed_texts = self._preprocess_df(df)
-        embedded_corpus = self.model.encode(preprocessed_texts, convert_to_tensor=True)
-        embedded_corpus_numpy = embedded_corpus.cpu().numpy()
+    async def __embed_df(self, df, path_to_file):
 
-        super()._save_file(embedded_corpus_numpy, path_to_file)
+        embedded_corpus = []
+        chunk_size = 96
 
-        return embedded_corpus_numpy
+        for i in range(0, len(df), chunk_size):
+            chunk = df[i:i+chunk_size]
+            texts = [f"{t}\n{a}" for t, a in zip(chunk["title"], chunk["abstract"])]
+            embedded_batch_result = await self._cohere_async_v2.embed(
+                texts=texts,
+                model=self._embedding_model,
+                input_type="search_document",
+                embedding_types=["float"]
+            )
+            embedded_batch = embedded_batch_result.embeddings.float
+            embedded_corpus.extend(embedded_batch)
+
+        super()._save_file(embedded_corpus, path_to_file)
+
+        return embedded_corpus

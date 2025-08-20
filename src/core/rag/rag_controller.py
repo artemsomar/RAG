@@ -18,13 +18,13 @@ class RagController:
         }
 
 
-    def search_best(self, query: str, method: str = "bm25") -> tuple[str, str]:
+    async def search_best(self, query: str, method: str = "bm25") -> tuple[str, str]:
         method = method.lower()
         if method not in self.methods:
             raise ValueError(f"Unknown method '{method}'. "
                              f"Available: {list(self.methods.keys())}")
         
-        return self.methods[method]().search_best(query)
+        return await self.methods[method]().search_best(query)
 
 
     def __get_bm25(self):

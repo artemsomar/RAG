@@ -6,8 +6,8 @@ from ..schemas import RagRequest, RagResponse
 router = APIRouter()
 
 @router.post("/", response_model=RagResponse)
-def rag_search(request: RagRequest, rag_controller: RagController = Depends()):
-    best_abstract, quote = rag_controller.search_best(
+async def rag_search(request: RagRequest, rag_controller: RagController = Depends()):
+    best_abstract, quote = await rag_controller.search_best(
         query=request.prompt,
         method=request.method,
     )

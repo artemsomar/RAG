@@ -20,10 +20,8 @@ class DatasetLoader:
         print(f"Downloading dataset '{self.dataset_name}' split '{split}'...")
         dataset = load_dataset(self.dataset_name, split=split)
 
-        # Збереження у CSV
-        df = dataset.to_pandas()
+        df = dataset.to_pandas().head(300)
         df.to_csv(path, index=False)
         print(f"Saved split '{split}' to {path}")
         
-        # Повертаємо знову як HuggingFace Dataset
         return Dataset.from_pandas(df)

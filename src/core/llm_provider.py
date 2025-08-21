@@ -1,8 +1,5 @@
 import os
 import cohere
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 class LlmProvider:

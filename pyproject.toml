@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "rag-1"
+version = "0.1.0"
+description = ""
+authors = ["Artem Somar <artemsomar0@gmail.com>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4.0"
+fastapi = ">=0.116.1,<0.117.0"
+uvicorn = { extras = ["standard"], version = ">=0.35.0,<0.36.0" }
+datasets = ">=4.0.0,<5.0.0"
+cohere = ">=5.17.0,<6.0.0"
+nltk = "^3.9.1"
+rank-bm25 = "^0.2.2"
+scikit-learn = "^1.7.1"
+sqlalchemy = {extras = ["asyncio"], version = "^2.0.43"}
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

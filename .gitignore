@@ -5,8 +5,12 @@ __pycache__/
 data/*
 !data/.gitkeep
 
+alembic/*
+alembic.ini
+
 .DS_Store
 Thumbs.db
 .env
 .vscode
 .idea
+/alembic/

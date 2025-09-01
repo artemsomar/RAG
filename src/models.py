@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import ARRAY, Float, String, ForeignKey, BigInteger, Text, UniqueConstraint
+from sqlalchemy import ARRAY, Float, String, ForeignKey, BigInteger, Text, UniqueConstraint, Boolean
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
 
 
@@ -30,6 +30,9 @@ class Document(Base):
     title: Mapped[str] = mapped_column(String(255))
     content: Mapped[str] = mapped_column(Text)
     source_url: Mapped[str | None]
+    is_embedded: Mapped[Boolean] = mapped_column(Boolean, default=False, server_default="false")
+    is_tokenized: Mapped[Boolean] = mapped_column(Boolean, default=False, server_default="false")
+
     embedded_chunks: Mapped[list["EmbeddedChunk"]] = relationship(back_populates="document")
     tokenized_chunks: Mapped[list["TokenizedChunk"]] = relationship(back_populates="document")
 
@@ -37,31 +40,33 @@ class Document(Base):
 class EmbeddedChunk(Base):
     __tablename__ = "embedded_chunks"
 
-    vector: Mapped[list[float]] = mapped_column(ARRAY(Float))
     model: Mapped[str] = mapped_column(String(128))
-    start_index: Mapped[int | None] = mapped_column(BigInteger)
-    end_index: Mapped[int | None] = mapped_column(BigInteger)
+    start_index: Mapped[int] = mapped_column(BigInteger)
+    end_index: Mapped[int] = mapped_column(BigInteger)
+    serial_idx: Mapped[int] = mapped_column()
+    document: Mapped["Document"] = relationship(back_populates="tokenized_chunks")
 
+    vector: Mapped[list[float]] = mapped_column(ARRAY(Float))
     document_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey("documents.id", name="fk_embedded_chunks_document_id"),
     )
-    document: Mapped["Document"] = relationship(back_populates="embedded_chunks")
 
 
 class TokenizedChunk(Base):
     __tablename__ = "tokenized_chunks"
 
-    tokens: Mapped[list[str]] = mapped_column(ARRAY(String))
     model: Mapped[str] = mapped_column(String(128))
-    start_index: Mapped[int | None] = mapped_column(BigInteger)
-    end_index: Mapped[int | None] = mapped_column(BigInteger)
+    start_index: Mapped[int] = mapped_column(BigInteger)
+    end_index: Mapped[int] = mapped_column(BigInteger)
+    serial_idx: Mapped[int] = mapped_column()
+    document: Mapped["Document"] = relationship(back_populates="tokenized_chunks")
 
+    tokens: Mapped[list[str]] = mapped_column(ARRAY(String))
     document_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey("documents.id", name="fk_tokenized_chunks_document_id")
     )
-    document: Mapped["Document"] = relationship(back_populates="tokenized_chunks")
 
 
 class Prompt(Base):

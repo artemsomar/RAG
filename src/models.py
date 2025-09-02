@@ -30,8 +30,6 @@ class Document(Base):
     title: Mapped[str] = mapped_column(String(255))
     content: Mapped[str] = mapped_column(Text)
     source_url: Mapped[str | None]
-    is_embedded: Mapped[Boolean] = mapped_column(Boolean, default=False, server_default="false")
-    is_tokenized: Mapped[Boolean] = mapped_column(Boolean, default=False, server_default="false")
 
     embedded_chunks: Mapped[list["EmbeddedChunk"]] = relationship(back_populates="document")
     tokenized_chunks: Mapped[list["TokenizedChunk"]] = relationship(back_populates="document")
@@ -40,13 +38,13 @@ class Document(Base):
 class EmbeddedChunk(Base):
     __tablename__ = "embedded_chunks"
 
+    vector: Mapped[list[float]] = mapped_column(ARRAY(Float))
     model: Mapped[str] = mapped_column(String(128))
     start_index: Mapped[int] = mapped_column(BigInteger)
     end_index: Mapped[int] = mapped_column(BigInteger)
     serial_idx: Mapped[int] = mapped_column()
-    document: Mapped["Document"] = relationship(back_populates="tokenized_chunks")
+    document: Mapped["Document"] = relationship(back_populates="embedded_chunks")
 
-    vector: Mapped[list[float]] = mapped_column(ARRAY(Float))
     document_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey("documents.id", name="fk_embedded_chunks_document_id"),

@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import ARRAY, Float, String, ForeignKey, BigInteger, Text, UniqueConstraint, Boolean
+from sqlalchemy import ARRAY, Float, String, ForeignKey, BigInteger, Text, UniqueConstraint, Integer
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
 
 
@@ -54,13 +54,13 @@ class EmbeddedChunk(Base):
 class TokenizedChunk(Base):
     __tablename__ = "tokenized_chunks"
 
+    tokens: Mapped[list[int]] = mapped_column(ARRAY(Integer))
     model: Mapped[str] = mapped_column(String(128))
     start_index: Mapped[int] = mapped_column(BigInteger)
     end_index: Mapped[int] = mapped_column(BigInteger)
     serial_idx: Mapped[int] = mapped_column()
     document: Mapped["Document"] = relationship(back_populates="tokenized_chunks")
 
-    tokens: Mapped[list[str]] = mapped_column(ARRAY(String))
     document_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey("documents.id", name="fk_tokenized_chunks_document_id")

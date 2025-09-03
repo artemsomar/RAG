@@ -13,7 +13,7 @@ class RagController:
     def __init__(self):
         self.__instances = {}
         self.methods = {
-            # "bm25": self.__get_bm25,
+            "bm25": self.__get_bm25,
             "semantic": self.__get_semantic,
             # "hybrid": self.__get_hybrid
         }
@@ -38,7 +38,7 @@ class RagController:
 
     def __get_bm25(self):
         if "bm25" not in self.__instances:
-            self.__instances["bm25"] = BM25(self.__df)
+            self.__instances["bm25"] = BM25()
             print("Created BM25")
         return self.__instances["bm25"]
 

@@ -10,7 +10,7 @@ router = APIRouter()
 @router.post("/", response_model=RagResponse)
 async def rag_search(request: RagRequest, rag_controller: RagController = Depends(), session: AsyncSession = Depends(session_dependency)):
 
-    chunks = await rag_controller.search_best(
+    best_chunks = await rag_controller.search_best(
         query=request.prompt,
         session=session,
         method=request.method,
@@ -19,7 +19,7 @@ async def rag_search(request: RagRequest, rag_controller: RagController = Depend
     documents_titles = []
     chunks_text = []
 
-    for chunk in chunks:
+    for chunk in best_chunks:
         document = await session.get(Document, chunk.document_id)
         # TODO: Add validation
 
@@ -27,7 +27,8 @@ async def rag_search(request: RagRequest, rag_controller: RagController = Depend
         text = document.content[chunk.start_index:chunk.end_index]
         chunks_text.append(text)
 
-    return RagResponse.model_validate( {
-        "documents_titles": documents_titles,
-        "chunks_text": chunks_text
-    })
+    chunks = [
+        {"document_title": title, "chunk_text": text}
+        for title, text in zip(documents_titles, chunks_text)
+    ]
+    return RagResponse.model_validate({ "chunks" : chunks })

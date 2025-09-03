@@ -14,7 +14,9 @@ class LlmRequest(BaseModel):
 class LlmResponse(BaseModel):
     response: str
 
+class ChunkResponse(BaseModel):
+    document_title: str
+    chunk_text: str
 
 class RagResponse(BaseModel):
-    documents_titles: list[str]
-    chunks_text: list[str]
+    chunks: list[ChunkResponse]

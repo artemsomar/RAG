@@ -4,27 +4,6 @@ import re
 from src.models import Document
 
 
-def chunk_document_by_words(
-        document: Document,
-        chunk_size: int = 50,
-        overlap: int = 20,
-) -> list[tuple[str, int, int]]:
-    preprocessed_content = preprocess_text(document.content)
-    words = preprocessed_content.split()
-    chunks = []
-    start = 0
-    while start < len(words):
-        end = start + chunk_size
-        chunk_words = words[start:end]
-        chunk_text = f"{document.title}\n{' '.join(chunk_words)}"
-        chunks.append(chunk_text)
-        start += chunk_size - overlap
-        if start < 0:
-            start = 0
-
-    return chunks
-
-
 def chunk_document_by_characters(
         document: Document,
         chunk_size: int = 1000,

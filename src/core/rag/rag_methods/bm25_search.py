@@ -1,32 +1,48 @@
+import numpy as np
 from rank_bm25 import BM25Okapi
-from src.core.rag.text_processing.tokenizing_processor import TokenizingProcessor
+from sqlalchemy.ext.asyncio import AsyncSession
+from src.models import Document, TokenizedChunk
+from src.core.rag.text_processing.tokenizing import Tokenizing
 
 class BM25:
 
-    def __init__(self, df):
-        self.df = df
-        self.tokenizer = TokenizingProcessor()
+    def __init__(self):
+        self.tokenizer = Tokenizing()
 
 
-    async def search_best(self, query) -> tuple[str, str]:
+    async def search_best(
+            self,
+            query: str,
+            documents: list[Document],
+            session: AsyncSession,
+            best_num: int = 1
+    ) -> list[TokenizedChunk]:
 
-        tokenized_corpus = await self.tokenizer.get_tokenized_corpus(self.df)
-        bm25 = BM25Okapi(tokenized_corpus)
+        best_scores: list[float] = []
+        best_chunks: list[TokenizedChunk] = []
+
         tokenized_query = await self.tokenizer.get_tokenized_query(query)
-        doc_scores = bm25.get_scores(tokenized_query)
+        for document in documents:
+            tokenized_chunks = await self.tokenizer.get_tokenized_chunks(document, session)
+            tokenized_corpus = [chunk.tokens for chunk in tokenized_chunks]
+            bm25 = BM25Okapi(tokenized_corpus)
+            doc_scores = np.asarray(bm25.get_scores(tokenized_query)).flatten()
+            local_top_indices = np.argsort(doc_scores)[-best_num:][::-1]
+            for idx in local_top_indices:
+                best_scores.append(doc_scores[idx].item())
+                best_chunks.append(tokenized_chunks[idx])
 
-        best_index = int(doc_scores.argmax())
-        quote = f" [{best_index}] {self.df[best_index]['title']} "
-        best_abstract = self.df[best_index]['abstract']
+        best_scores_array = np.array(best_scores)
+        global_top_indices = np.argsort(best_scores_array)[-best_num:][::-1]
+        best_chunks = [best_chunks[i] for i in global_top_indices]
+        return best_chunks
 
-        return best_abstract, quote
 
-
-    async def get_all_scores(self, query):
-
-        tokenized_corpus = await self.tokenizer.get_tokenized_corpus(self.df)
-        bm25 = BM25Okapi(tokenized_corpus)
-        tokenized_query = await self.tokenizer.get_tokenized_query(query)
-        doc_scores = bm25.get_scores(tokenized_query)
-
-        return doc_scores
+    # async def get_all_scores(self, query):
+    #
+    #     tokenized_corpus = await self.tokenizer.get_tokenized_corpus(self.df)
+    #     bm25 = BM25Okapi(tokenized_corpus)
+    #     tokenized_query = await self.tokenizer.get_tokenized_query(query)
+    #     doc_scores = bm25.get_scores(tokenized_query)
+    #
+    #     return doc_scores

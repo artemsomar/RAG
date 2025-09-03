@@ -14,19 +14,19 @@ class DbSettings(BaseModel):
     def url(self) -> str:
         return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
 
+class ChunkSettings(BaseModel):
+    chunk_size_in_characters: int = 500
+    overlap_in_characters: int = 100
+
 
 class TokenizingSettings(BaseModel):
     token: str
     model: str = "command-a-03-2025"
-    chunk_size_in_characters: int = 500
-    overlap_in_characters: int = 100
 
 
 class EmbeddingSettings(BaseModel):
     token: str
     model: str = "embed-v4.0"
-    chunk_size_in_characters: int = 500
-    overlap_in_characters: int = 100
     batch_size: int = 96
 
 
@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     db: DbSettings
     embedding: EmbeddingSettings
     tokenizing: TokenizingSettings
+    chunking: ChunkSettings = ChunkSettings()
 
     class Config:
         env_file = ".env"

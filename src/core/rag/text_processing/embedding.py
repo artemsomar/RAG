@@ -2,6 +2,7 @@ import cohere
 from sqlalchemy import select, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+from torch import Tensor
 
 from .utils import chunk_document_by_characters
 from src.config import settings
@@ -32,7 +33,7 @@ class Embedding:
         return list(chunks.scalars().all())
 
 
-    async def get_embedded_query(self, query):
+    async def get_embedded_query(self, query) -> Tensor:
         embedded_query_result = await self._client.embed(
             texts=[query],
             model=self._embedding_model,
@@ -44,7 +45,11 @@ class Embedding:
 
 
     async def _document_embedding_by_chunks(self, document: Document, session: AsyncSession):
-        indexed_chunks = chunk_document_by_characters(document)
+        indexed_chunks = chunk_document_by_characters(
+            document,
+            settings.chunking.chunk_size_in_characters,
+            settings.chunking.overlap_in_characters
+        )
         for i in range(0, len(indexed_chunks), self._model_embedding_batch):
             batch = indexed_chunks[i:i+self._model_embedding_batch]
             batch_text = [chunk[0] for chunk in batch]

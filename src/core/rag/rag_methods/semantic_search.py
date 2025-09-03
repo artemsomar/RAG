@@ -39,9 +39,20 @@ class SemanticSearch:
         return best_chunks
 
 
-    async def get_all_scores(self, query):
+    async def get_all_scores(
+            self,
+            query: str,
+            documents: list[Document],
+            session: AsyncSession
+    ) -> list[list[float]]:
+        scores: list[list[float]] = []
         embedded_query = await self.embedder.get_embedded_query(query)
-        embedded_corpus = await self.embedder.get_embedded_corpus(self.df)
-        cor_scores = util.pytorch_cos_sim(embedded_query, embedded_corpus)[0]
+        for document in documents:
+            embedded_chunks = await self.embedder.get_embedded_chunks(document, session)
+            chunks_vectors = [chunk.vector for chunk in embedded_chunks]
+            embedded_chunks_tensor = torch.tensor(chunks_vectors, dtype=torch.float32)
+            cor_scores = util.pytorch_cos_sim(embedded_query, embedded_chunks_tensor)[0]
 
-        return cor_scores
+            scores.append(cor_scores.tolist())
+
+        return scores

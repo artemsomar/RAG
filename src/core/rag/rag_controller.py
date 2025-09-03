@@ -15,7 +15,7 @@ class RagController:
         self.methods = {
             "bm25": self.__get_bm25,
             "semantic": self.__get_semantic,
-            # "hybrid": self.__get_hybrid
+            "hybrid": self.__get_hybrid
         }
 
 
@@ -52,7 +52,7 @@ class RagController:
 
     def __get_hybrid(self):
         if "hybrid" not in self.__instances:
-            self.__instances["hybrid"] = HybridSearch(self.__df)
+            self.__instances["hybrid"] = HybridSearch()
             print("Created Hybrid")
         return self.__instances["hybrid"]
 

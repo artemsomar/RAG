@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.models import Document, TokenizedChunk
 from src.core.rag.text_processing.tokenizing import Tokenizing
 
+
 class BM25:
 
     def __init__(self):
@@ -38,11 +39,19 @@ class BM25:
         return best_chunks
 
 
-    # async def get_all_scores(self, query):
-    #
-    #     tokenized_corpus = await self.tokenizer.get_tokenized_corpus(self.df)
-    #     bm25 = BM25Okapi(tokenized_corpus)
-    #     tokenized_query = await self.tokenizer.get_tokenized_query(query)
-    #     doc_scores = bm25.get_scores(tokenized_query)
-    #
-    #     return doc_scores
+    async def get_all_scores(
+            self,
+            query: str,
+            documents: list[Document],
+            session: AsyncSession,
+    ) -> list[list[float]]:
+        scores: list[list[float]] = []
+        tokenized_query = await self.tokenizer.get_tokenized_query(query)
+        for document in documents:
+            tokenized_chunks = await self.tokenizer.get_tokenized_chunks(document, session)
+            tokenized_corpus = [chunk.tokens for chunk in tokenized_chunks]
+            bm25 = BM25Okapi(tokenized_corpus)
+            doc_scores = bm25.get_scores(tokenized_query)
+            scores.append(doc_scores)
+
+        return scores

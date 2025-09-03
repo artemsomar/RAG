@@ -1,8 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.models import Document
-from src.dataset_loader import DatasetLoader
+from src.models import Document, TokenizedChunk, EmbeddedChunk
 from src.core.rag.rag_methods.bm25_search import BM25
 from src.core.rag.rag_methods.semantic_search import SemanticSearch
 from src.core.rag.rag_methods.hybrid_search import HybridSearch
@@ -25,7 +24,7 @@ class RagController:
             session: AsyncSession,
             best_num: int = 3,
             method: str = "semantic"
-    ):
+    ) -> list[TokenizedChunk | EmbeddedChunk]:
         method = method.lower()
         if method not in self.methods:
             raise ValueError(f"Unknown method '{method}'. "

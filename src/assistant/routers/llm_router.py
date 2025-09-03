@@ -7,6 +7,7 @@ router = APIRouter()
 
 @router.post("/", response_model=LlmResponse)
 async def llm_query(request: LlmRequest, llm_provider: LlmProvider = Depends()):
+    # TODO: додаи системний пропт з бази даних
     response = await llm_provider.chat_completion(
         user_prompt=request.prompt,
     )

@@ -4,7 +4,6 @@ from pydantic import BaseModel
 class RagRequest(BaseModel):
     prompt: str
     method: str = "bm25"
-    best_num: int = 1
 
 
 class LlmRequest(BaseModel):
@@ -16,5 +15,5 @@ class LlmResponse(BaseModel):
 
 
 class RagResponse(BaseModel):
-    documents_titles: list[str]
-    chunks_text: list[str]
+    quote: str
+    best_abstract: str

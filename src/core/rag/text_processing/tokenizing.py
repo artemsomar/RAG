@@ -30,7 +30,7 @@ class Tokenizing:
         return list(chunks.scalars().all())
 
 
-    async def get_tokenized_query(self, query) -> list[int]:
+    async def get_tokenized_query(self, query):
         text = query.lower()
         tokens_info = await self._client.tokenize(
             text=text,
@@ -40,11 +40,7 @@ class Tokenizing:
 
 
     async def _document_tokenizing_by_chunks(self, document: Document, session: AsyncSession):
-        indexed_chunks = chunk_document_by_characters(
-            document,
-            settings.chunking.chunk_size_in_characters,
-            settings.chunking.overlap_in_characters
-        )
+        indexed_chunks = chunk_document_by_characters(document)
         for index, indexed_chunk in enumerate(indexed_chunks):
             tokens_info = await self._client.tokenize(
                 text=indexed_chunk[0].lower(),

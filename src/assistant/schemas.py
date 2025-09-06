@@ -2,19 +2,21 @@ from pydantic import BaseModel
 
 
 class RagRequest(BaseModel):
-    query: str
+    prompt: str
     method: str = "bm25"
     best_num: int = 1
 
+
 class LlmRequest(BaseModel):
-    query: str
+    prompt: str
+
 
 class LlmResponse(BaseModel):
     response: str
 
-class ChunkInfo(BaseModel):
+class ChunkResponse(BaseModel):
     document_title: str
     chunk_text: str
 
 class RagResponse(BaseModel):
-    chunks: list[ChunkInfo]
+    chunks: list[ChunkResponse]

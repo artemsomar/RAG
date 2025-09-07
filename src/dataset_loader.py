@@ -1,6 +1,8 @@
+#TODO: Must be rewrote or deleted
 from datasets import load_dataset, Dataset
 from pathlib import Path
 import pandas as pd
+
 
 class DatasetLoader:
 
@@ -8,6 +10,7 @@ class DatasetLoader:
         self.dataset_name = dataset_name
         self.data_dir = Path(data_dir)
         self.data_dir.mkdir(parents=True, exist_ok=True)
+
 
     def load(self, split="train"):
         path = self.data_dir / f"{split}.csv"

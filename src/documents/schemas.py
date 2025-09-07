@@ -8,9 +8,9 @@ class DocumentBase(BaseModel):
     source_url: Optional[str] = None
 
 
-class Document(DocumentBase):
-    model_config = ConfigDict(from_attributes=True)
+class DocumentSchema(DocumentBase):
     id: int
+    model_config = ConfigDict(from_attributes=True)
 
 
 class DocumentCreate(DocumentBase):

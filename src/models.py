@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import ARRAY, Float, String, ForeignKey, BigInteger, Text, UniqueConstraint, Integer
+from sqlalchemy import ARRAY, Float, String, ForeignKey, BigInteger, Text, UniqueConstraint, Integer, Boolean
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
 
 
@@ -19,9 +19,11 @@ class User(Base):
 
     username: Mapped[str] = mapped_column(String(64), unique=True)
     email: Mapped[str] = mapped_column(String(64), unique=True)
-    password_hash: Mapped[str] = mapped_column(String(255))
-    created_at: Mapped[datetime]
+    password_hash: Mapped[bytes]
+    isActive: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     role: Mapped[str] = mapped_column(String(32))
+
+    documents: Mapped[list["Document"]] = relationship(back_populates="user")
 
 
 class Document(Base):
@@ -33,6 +35,12 @@ class Document(Base):
 
     embedded_chunks: Mapped[list["EmbeddedChunk"]] = relationship(back_populates="document")
     tokenized_chunks: Mapped[list["TokenizedChunk"]] = relationship(back_populates="document")
+    user: Mapped["User"] = relationship(back_populates="documents")
+
+    user_id: Mapped[int] = mapped_column(
+        BigInteger,
+        ForeignKey("users.id", name="fk_document_user_id")
+    )
 
 
 class EmbeddedChunk(Base):

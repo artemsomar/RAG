@@ -8,6 +8,8 @@ data/*
 alembic/*
 alembic.ini
 
+certs/*
+
 .DS_Store
 Thumbs.db
 .env

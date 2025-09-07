@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.database import session_dependency
 from ..schemas import RagRequest, LlmResponse
 from ..service import RetrievalService

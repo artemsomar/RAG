@@ -6,14 +6,22 @@ class TokenInfo(BaseModel):
     token_type: str = "Bearer"
 
 
-class AuthUser(BaseModel):
+class UserLogin(BaseModel):
     username: str
     password: str
 
 
-class UserSchema(BaseModel):
-    id: int
+class UserBase(BaseModel):
     username: str
     password: str
     email: EmailStr
+
+
+class UserSchema(UserBase):
+    id: int
+
+
+class UserCreate(UserBase):
+    pass
+
 

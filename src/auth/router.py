@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.dependencies import validate_auth_user
 from src.auth import utils as auth_utils
-from .schemas import TokenInfo, UserSchema, UserCreate
+from .schemas import TokenInfo, UserSchema, UserCreate, UserRegisteredResponse
 from .utils import hash_password
 from ..database import session_dependency
 from ..models import User
@@ -21,6 +21,7 @@ async def auth_user_jwt(
         "sub": user.id,
         "username": user.username,
         "email": user.email,
+        "role": user.role,
     }
     token = auth_utils.encode_jwt(payload)
     return TokenInfo(
@@ -28,7 +29,7 @@ async def auth_user_jwt(
     )
 
 
-@router.post("/register/", status_code=status.HTTP_201_CREATED)
+@router.post("/register/", status_code=status.HTTP_201_CREATED, response_model=UserRegisteredResponse)
 async def register_user(
         user: UserCreate,
         session: AsyncSession = Depends(session_dependency)
@@ -56,10 +57,10 @@ async def register_user(
     await session.commit()
     await session.refresh(new_user)
 
-    return {
-        "id": new_user.id,
-        "username": new_user.username,
-        "email": new_user.email,
-    }
+    return UserRegisteredResponse.model_validate({
+        "id" : new_user.id,
+        "username" : new_user.username,
+        "email" : new_user.email
+    })
 
 

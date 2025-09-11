@@ -5,23 +5,25 @@ class TokenInfo(BaseModel):
     access_token: str
     token_type: str = "Bearer"
 
-
 class UserLogin(BaseModel):
     username: str
     password: str
 
+class UserSchema(BaseModel):
+    id: int
+    username: str
+    password: str
+    email: EmailStr
+    role: str
 
-class UserBase(BaseModel):
+class UserCreate(BaseModel):
     username: str
     password: str
     email: EmailStr
 
-
-class UserSchema(UserBase):
+class UserRegisteredResponse(BaseModel):
     id: int
-
-
-class UserCreate(UserBase):
-    pass
+    username: str
+    email: EmailStr
 
 

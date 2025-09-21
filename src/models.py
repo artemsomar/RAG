@@ -1,4 +1,4 @@
-from datetime import datetime
+from typing import Optional
 from sqlalchemy import ARRAY, Float, String, ForeignKey, BigInteger, Text, UniqueConstraint, Integer, Boolean
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
 
@@ -32,9 +32,7 @@ class Document(Base):
     title: Mapped[str] = mapped_column(String(255))
     content: Mapped[str] = mapped_column(Text)
     source_url: Mapped[str | None]
-
-    embedded_chunks: Mapped[list["EmbeddedChunk"]] = relationship(back_populates="document")
-    tokenized_chunks: Mapped[list["TokenizedChunk"]] = relationship(back_populates="document")
+    chunks: Mapped[list["Chunk"]] = relationship(back_populates="document")
     user: Mapped["User"] = relationship(back_populates="documents")
 
     user_id: Mapped[int] = mapped_column(
@@ -43,15 +41,15 @@ class Document(Base):
     )
 
 
-class EmbeddedChunk(Base):
-    __tablename__ = "embedded_chunks"
+class Chunk(Base):
+    __tablename__ = "chunks"
 
-    vector: Mapped[list[float]] = mapped_column(ARRAY(Float))
-    model: Mapped[str] = mapped_column(String(128))
     start_index: Mapped[int] = mapped_column(BigInteger)
     end_index: Mapped[int] = mapped_column(BigInteger)
     serial_idx: Mapped[int] = mapped_column()
-    document: Mapped["Document"] = relationship(back_populates="embedded_chunks")
+    document: Mapped["Document"] = relationship(back_populates="chunks")
+    vector: Mapped[Optional["ChunkVector"]] = relationship(back_populates="chunk")
+    tokens: Mapped[Optional["ChunkTokens"]] = relationship(back_populates="chunk")
 
     document_id: Mapped[int] = mapped_column(
         BigInteger,
@@ -59,19 +57,31 @@ class EmbeddedChunk(Base):
     )
 
 
-class TokenizedChunk(Base):
-    __tablename__ = "tokenized_chunks"
+class ChunkVector(Base):
+    __tablename__ = "chunk_vector"
+
+    vector: Mapped[list[float]] = mapped_column(ARRAY(Float))
+    model: Mapped[str] = mapped_column(String(128))
+
+    chunk: Mapped["Chunk"] = relationship(back_populates="vector")
+
+    chunk_id: Mapped[int] = mapped_column(
+        BigInteger,
+        ForeignKey("chunks.id", name="fk_chunk_vector_chunk_id"),
+    )
+
+
+class ChunkTokens(Base):
+    __tablename__ = "chunk_tokens"
 
     tokens: Mapped[list[int]] = mapped_column(ARRAY(Integer))
     model: Mapped[str] = mapped_column(String(128))
-    start_index: Mapped[int] = mapped_column(BigInteger)
-    end_index: Mapped[int] = mapped_column(BigInteger)
-    serial_idx: Mapped[int] = mapped_column()
-    document: Mapped["Document"] = relationship(back_populates="tokenized_chunks")
 
-    document_id: Mapped[int] = mapped_column(
+    chunk: Mapped["Chunk"] = relationship(back_populates="tokens")
+
+    chunk_id: Mapped[int] = mapped_column(
         BigInteger,
-        ForeignKey("documents.id", name="fk_tokenized_chunks_document_id")
+        ForeignKey("chunks.id", name="fk_chunk_tokens_chunk_id"),
     )
 
 

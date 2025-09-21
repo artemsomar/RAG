@@ -1,5 +1,3 @@
-from fastapi import HTTPException, status
-
 from src.auth import utils as auth_utils
 from src.config import settings
 from src.models import User

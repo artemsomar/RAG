@@ -1,45 +1,63 @@
+import cohere
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from src.core.llm_provider import LlmProvider
-from src.core.rag.rag_controller import RagController
-from .utils import get_chunks_info
-from ..models import Prompt
+from src.config import settings
+from src.retrieval.services import retrieval_service, chunks_service
+from src.models import Document, Prompt
 
 
-class RetrievalService:
-
-    def __init__(self):
-        self._llm_provider = LlmProvider()
-        self._rag_controller = RagController()
+MODEL = settings.llm.model
+CLIENT = cohere.AsyncClientV2(settings.llm.token)
 
 
-    async def generate_answer_with_rag(
-            self,
-            query: str,
-            session: AsyncSession,
-            best_num: int = 1,
-            method: str = "bm25",
-    ):
-        chunks = await self._rag_controller.search_best(query, session, best_num, method)
-        chunks_info = await get_chunks_info(chunks, session)
-        information, quotes = "", ""
-        for chunk in chunks_info:
-            information += f"{chunk.chunk_text}\n\n"
-            quotes += f"\n[{chunk.document_title}] "
+async def generate_rag_answer(
+        query: str,
+        documents: list[Document],
+        method: str,
+        best_num: int,
+        session: AsyncSession,
+) -> str:
+    chunks = await retrieval_service.get_best_chunks(
+        query,
+        documents,
+        method,
+        best_num,
+        session
+    )
+    chunks_info = await chunks_service.get_chunks_info(chunks, session)
+    information, quotes = "", ""
+    for document_title, content in chunks_info:
+        information += f"{content}\n\n"
+        quotes += f"\n[{document_title}] "
 
-        prompt_result = await session.execute(
-            select(Prompt).where(Prompt.template_key == "answer_with_sources")
-        )
-        prompt = prompt_result.scalar_one_or_none()
-        if prompt is None:
-            raise ValueError("Prompt with key 'answer_with_sources' not found")
+    prompt_template = await _get_prompt_template("answer_with_sources", session)
 
-        prompt = prompt.template.format(
-            information=information,
-            query=query,
-        )
+    prompt = prompt_template.template.format(
+        information=information,
+        query=query,
+    )
 
-        llm_answer = await self._llm_provider.chat_completion(prompt)
-        answer = f"{llm_answer} {quotes}"
-        return answer
+    llm_answer = await chat_completion(prompt)
+    answer = f"{llm_answer} {quotes}"
+    return answer
+
+
+async def chat_completion(user_prompt: str) -> str:
+    completion = await CLIENT.chat(
+        model=MODEL,
+        messages=[cohere.UserChatMessageV2(content=user_prompt)],
+    )
+    return completion.message.content[0].text
+
+
+async def _get_prompt_template(
+        template_key: str,
+        session: AsyncSession
+):
+    prompt_result = await session.execute(
+        select(Prompt).where(Prompt.template_key == template_key)
+    )
+    prompt = prompt_result.scalar_one_or_none()
+    if prompt is None:
+        raise ValueError("Prompt with key 'answer_with_sources' not found")
+    return prompt

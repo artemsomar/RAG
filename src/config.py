@@ -18,22 +18,22 @@ class DbSettings(BaseModel):
     def url(self) -> str:
         return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
 
+class LlmSettings(BaseModel):
+    token: str
+    model: str = "command-a-03-2025"
 
 class Chunking(BaseModel):
-    chunk_size_in_characters: int = 500
-    overlap_in_characters: int = 100
-
+    size_in_characters: int = 1000
+    overlap_in_characters: int = 200
 
 class Tokenizing(BaseModel):
     token: str
     model: str = "command-a-03-2025"
 
-
 class Embedding(BaseModel):
     token: str
     model: str = "embed-v4.0"
     batch_size: int = 96
-
 
 class AuthJWT(BaseModel):
     private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem"
@@ -47,6 +47,7 @@ class Settings(BaseSettings):
     db: DbSettings
     embedding: Embedding
     tokenizing: Tokenizing
+    llm: LlmSettings
     chunking: Chunking = Chunking()
     auth: AuthJWT = AuthJWT()
 

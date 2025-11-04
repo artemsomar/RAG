@@ -2,9 +2,6 @@ __pycache__/
 
 .venv
 
-data/*
-!data/.gitkeep
-
 alembic/*
 alembic.ini
 

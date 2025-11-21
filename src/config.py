@@ -9,7 +9,7 @@ print(BASE_DIR)
 class DbSettings(BaseModel):
     user: str
     password: str
-    host: str = "localhost"
+    host: str = "pg"
     port: int = 5432
     database: str = "rag"
     echo: bool = False

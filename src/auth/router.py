@@ -29,7 +29,7 @@ async def register_user(
         user_data: UserCreate,
         session: AsyncSession = Depends(session_dependency)
 ):
-    new_user = await auth_service.create_user(session, user_data)
+    new_user = await auth_service.create_user(user_data, session)
     if not new_user:
         raise HTTPException(
             status_code=409,

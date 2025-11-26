@@ -3,9 +3,7 @@ from src.config import settings
 from src.models import User
 
 
-def create_access_token(
-        user: User
-) -> str:
+def create_access_token(user: User) -> str:
     payload = {
         "type": "access",
         "sub": user.id,
@@ -20,9 +18,7 @@ def create_access_token(
     return access_token
 
 
-def create_refresh_token(
-        user: User
-) -> str:
+def create_refresh_token(user: User) -> str:
     payload = {
         "type": "refresh",
         "sub": user.id,

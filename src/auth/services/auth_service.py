@@ -6,9 +6,9 @@ from src.models import User
 
 
 async def authenticate_user(
-        username: str,
-        password: str,
-        session: AsyncSession,
+    username: str,
+    password: str,
+    session: AsyncSession,
 ) -> User | None:
     result = await session.execute(select(User).where(User.username == username))
     user = result.scalars().first()
@@ -20,23 +20,20 @@ async def authenticate_user(
 
 
 async def get_user_by_id(
-        user_id: int,
-        session: AsyncSession,
+    user_id: int,
+    session: AsyncSession,
 ) -> User | None:
     result = await session.execute(select(User).where(User.id == user_id))
     return result.scalars().first()
 
 
 async def create_user(
-        user_data: UserCreate,
-        session: AsyncSession,
+    user_data: UserCreate,
+    session: AsyncSession,
 ) -> User | None:
     existing_user = await session.execute(
         select(User).where(
-            or_(
-                User.username == user_data.username,
-                User.email == user_data.email
-            )
+            or_(User.username == user_data.username, User.email == user_data.email)
         )
     )
     if existing_user.scalar_one_or_none():

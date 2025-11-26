@@ -2,9 +2,6 @@ __pycache__/
 
 .venv
 
-alembic/*
-alembic.ini
-
 certs/*
 
 .DS_Store
@@ -12,4 +9,3 @@ Thumbs.db
 .env
 .vscode
 .idea
-/alembic/

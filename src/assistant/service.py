@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.config import settings
 from src.retrieval.services import retrieval_service, chunks_service
-from src.models import Document, Prompt
+from src.database.models import Document, Prompt
 
 
 MODEL = settings.llm.model
@@ -11,18 +11,14 @@ CLIENT = cohere.AsyncClientV2(settings.llm.token)
 
 
 async def generate_rag_answer(
-        query: str,
-        documents: list[Document],
-        method: str,
-        best_num: int,
-        session: AsyncSession,
+    query: str,
+    documents: list[Document],
+    method: str,
+    best_num: int,
+    session: AsyncSession,
 ) -> str:
     chunks = await retrieval_service.get_best_chunks(
-        query,
-        documents,
-        method,
-        best_num,
-        session
+        query, documents, method, best_num, session
     )
     chunks_info = await chunks_service.get_chunks_info(chunks, session)
     information, quotes = "", ""
@@ -50,10 +46,7 @@ async def chat_completion(user_prompt: str) -> str:
     return completion.message.content[0].text
 
 
-async def _get_prompt_template(
-        template_key: str,
-        session: AsyncSession
-):
+async def _get_prompt_template(template_key: str, session: AsyncSession):
     prompt_result = await session.execute(
         select(Prompt).where(Prompt.template_key == template_key)
     )

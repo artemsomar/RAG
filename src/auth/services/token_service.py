@@ -1,6 +1,6 @@
 from src.auth import utils as auth_utils
 from src.config import settings
-from src.models import User
+from src.database.models import User
 
 
 def create_access_token(user: User) -> str:

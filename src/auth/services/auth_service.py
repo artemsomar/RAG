@@ -2,7 +2,7 @@ from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.schemas import UserCreate
 from src.auth.utils import validate_password, hash_password
-from src.models import User
+from src.database.models import User
 
 
 async def authenticate_user(

@@ -1,12 +1,10 @@
 import numpy as np
 from rank_bm25 import BM25Okapi
-from src.models import ChunkTokens
+from src.database.models import ChunkTokens
 
 
 def search_best(
-        tokenized_query: list[int],
-        processed_chunks: list[ChunkTokens],
-        best_num: int = 1
+    tokenized_query: list[int], processed_chunks: list[ChunkTokens], best_num: int = 1
 ) -> list[ChunkTokens]:
 
     tokenized_corpus = [chunk.tokens for chunk in processed_chunks]
@@ -18,8 +16,8 @@ def search_best(
 
 
 def get_all_scores(
-        tokenized_query: list[int],
-        processed_chunks: list[ChunkTokens],
+    tokenized_query: list[int],
+    processed_chunks: list[ChunkTokens],
 ) -> list[list[float]]:
     tokenized_corpus = [chunk_tokens.tokens for chunk_tokens in processed_chunks]
     bm25 = BM25Okapi(tokenized_corpus)

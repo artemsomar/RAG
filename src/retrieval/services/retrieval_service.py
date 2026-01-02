@@ -1,18 +1,22 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.retrieval.preprocessing import chunking, embedding, tokenizing
-from src.models import Chunk, Document, ChunkTokens, ChunkVector
+from src.database.models import Chunk, Document, ChunkTokens, ChunkVector
 from src.retrieval.exceptions import InvalidRagMethod
 from src.retrieval.methods import bm25, semantic_search
-from src.retrieval.services.chunks_service import get_chunks_from_session, create_chunks_into_session, \
-    get_chunks_related, get_chunks_by_children
+from src.retrieval.services.chunks_service import (
+    get_chunks_from_session,
+    create_chunks_into_session,
+    get_chunks_related,
+    get_chunks_by_children,
+)
 
 
 async def get_best_chunks(
-        query: str,
-        documents: list[Document],
-        method: str,
-        best_num: int,
-        session: AsyncSession
+    query: str,
+    documents: list[Document],
+    method: str,
+    best_num: int,
+    session: AsyncSession,
 ) -> list[Chunk]:
     strategies = {
         "bm25": {
@@ -26,7 +30,7 @@ async def get_best_chunks(
             "preprocess_chunks": embedding.preprocess_chunks,
             "preprocess_query": embedding.preprocess_query,
             "search_best": semantic_search.search_best,
-        }
+        },
     }
 
     if method not in strategies:
@@ -50,8 +54,7 @@ async def get_best_chunks(
 
     query_repr = await strat["preprocess_query"](query)
     best_children = strat["search_best"](query_repr, processed_chunks, best_num)
-    best_chunks = await get_chunks_by_children(best_children, strat["child_type"], session)
+    best_chunks = await get_chunks_by_children(
+        best_children, strat["child_type"], session
+    )
     return best_chunks
-
-
-

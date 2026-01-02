@@ -1,11 +1,11 @@
 from src.config import settings
-from src.models import Document, Chunk
+from src.database.models import Document, Chunk
 
 
 def chunk_document_by_characters(
-        document: Document,
-        chunk_size: int = settings.chunking.size_in_characters,
-        overlap: int = settings.chunking.overlap_in_characters,
+    document: Document,
+    chunk_size: int = settings.chunking.size_in_characters,
+    overlap: int = settings.chunking.overlap_in_characters,
 ) -> list[Chunk]:
 
     chunks: list[Chunk] = []

@@ -1,18 +1,18 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from src.models import Chunk, Document, ChunkTokens, ChunkVector
+from src.database.models import Chunk, Document, ChunkTokens, ChunkVector
 from src.retrieval.exceptions import DocumentInvalid, ChunkInvalid
 
 
-async def get_chunks_info(chunks: list[Chunk], session: AsyncSession) -> list[tuple[str, str]]:
+async def get_chunks_info(
+    chunks: list[Chunk], session: AsyncSession
+) -> list[tuple[str, str]]:
     chunks_info_lst = []
     for chunk_in in chunks:
         chunk_req = await session.execute(
             select(Chunk)
-            .options(
-                selectinload(Chunk.document)
-            )
+            .options(selectinload(Chunk.document))
             .where(Chunk.id == chunk_in.id)
         )
         chunk = chunk_req.scalar_one_or_none()
@@ -33,14 +33,11 @@ def get_chunk_text(chunk: Chunk, document: Document) -> str:
 
 
 async def get_chunks_from_session(
-        document: Document,
-        session: AsyncSession
+    document: Document, session: AsyncSession
 ) -> list[Chunk]:
     document_result = await session.execute(
         select(Document)
-        .options(
-            selectinload(Document.chunks)
-        )
+        .options(selectinload(Document.chunks))
         .where(Document.id == document.id)
     )
     document = document_result.scalar_one_or_none()
@@ -51,8 +48,7 @@ async def get_chunks_from_session(
 
 
 async def create_chunks_into_session(
-        chunks: list[Chunk | ChunkTokens | ChunkVector],
-        session: AsyncSession
+    chunks: list[Chunk | ChunkTokens | ChunkVector], session: AsyncSession
 ) -> list[Chunk]:
     for chunk in chunks:
         session.add(chunk)
@@ -64,9 +60,7 @@ async def create_chunks_into_session(
 
 
 async def get_chunks_related(
-    chunks: list[Chunk],
-    related_type: type,
-    session: AsyncSession
+    chunks: list[Chunk], related_type: type, session: AsyncSession
 ):
     chunk_ids = [c.id for c in chunks]
     result = await session.execute(
@@ -78,9 +72,9 @@ async def get_chunks_related(
 
 
 async def get_chunks_by_children(
-        children_lst: list[ChunkTokens | ChunkVector],
-        children_type: type,
-        session: AsyncSession
+    children_lst: list[ChunkTokens | ChunkVector],
+    children_type: type,
+    session: AsyncSession,
 ) -> list[Chunk]:
     chunks = []
 
@@ -90,9 +84,7 @@ async def get_chunks_by_children(
     for child in children_lst:
         child_result = await session.execute(
             select(children_type)
-            .options(
-                selectinload(children_type.chunk)
-            )
+            .options(selectinload(children_type.chunk))
             .where(ChunkTokens.id == child.id)
         )
         child = child_result.scalar_one_or_none()

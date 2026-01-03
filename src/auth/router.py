@@ -7,7 +7,7 @@ from src.auth.dependencies import (
     get_current_user_for_refresh,
 )
 from src.auth.schemas import TokenInfo, UserCreate, UserRegisteredResponse
-from src.database.database import session_dependency
+from src.database.session import session_dependency
 from src.database.models import User
 from src.auth.services import auth_service as auth_service
 from src.auth.services import token_service as token_service

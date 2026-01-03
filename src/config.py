@@ -49,7 +49,7 @@ class EmbeddingSettings(BaseModel):
     batch_size: int = 96
 
 
-class AuthJWT(BaseModel):
+class AuthJwtSettings(BaseModel):
     private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem"
     public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
     algorithm: str = "RS256"
@@ -64,7 +64,7 @@ class Settings(BaseSettings):
     tokenizing: TokenizingSettings
     llm: LlmSettings
     chunking: ChunkingSettings = ChunkingSettings()
-    auth: AuthJWT = AuthJWT()
+    auth: AuthJwtSettings = AuthJwtSettings()
 
     class Config:
         env_file = ".env"

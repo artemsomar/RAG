@@ -1,7 +1,7 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.documents.dependencies import get_document_by_id
-from src.database.database import session_dependency
+from src.database.session import session_dependency
 from src.documents import service as documents_service
 from src.documents.schemas import DocumentCreate, DocumentSchema, DocumentUpdate
 from src.database.models import Document, User
@@ -21,11 +21,11 @@ async def get_documents(
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=DocumentSchema)
 async def create_document(
-    document_in: DocumentCreate,
+    file: UploadFile = File(...),
     user: User = Depends(get_current_auth_user),
     session: AsyncSession = Depends(session_dependency),
 ):
-    return await documents_service.create_document(document_in, user, session)
+    return await documents_service.create_document(file, user, session)
 
 
 @router.get("/{document_id}/", response_model=DocumentSchema)

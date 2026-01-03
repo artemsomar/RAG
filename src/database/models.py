@@ -1,5 +1,15 @@
 from typing import Optional
-from sqlalchemy import ARRAY, Float, String, ForeignKey, BigInteger, Text, UniqueConstraint, Integer, Boolean
+from sqlalchemy import (
+    ARRAY,
+    Float,
+    String,
+    ForeignKey,
+    BigInteger,
+    Text,
+    UniqueConstraint,
+    Integer,
+    Boolean,
+)
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped, relationship
 
 
@@ -31,13 +41,17 @@ class Document(Base):
 
     title: Mapped[str] = mapped_column(String(255))
     content: Mapped[str] = mapped_column(Text)
-    source_url: Mapped[str | None]
+    content: Mapped[str] = mapped_column(Text, default="")
+
+    s3_object_key: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    source_url: Mapped[str] = mapped_column(String(512), nullable=False)
+    media_type: Mapped[str] = mapped_column(String(100), nullable=False)
+
     chunks: Mapped[list["Chunk"]] = relationship(back_populates="document")
     user: Mapped["User"] = relationship(back_populates="documents")
 
     user_id: Mapped[int] = mapped_column(
-        BigInteger,
-        ForeignKey("users.id", name="fk_document_user_id")
+        BigInteger, ForeignKey("users.id", name="fk_document_user_id")
     )
 
 
@@ -88,9 +102,7 @@ class ChunkTokens(Base):
 class Prompt(Base):
     __tablename__ = "prompts"
 
-    __table_args__ = (
-        UniqueConstraint("template_key", name="uq_prompts_tkey"),
-    )
+    __table_args__ = (UniqueConstraint("template_key", name="uq_prompts_tkey"),)
 
     template_key: Mapped[str] = mapped_column(String(100), unique=True, index=True)
     template: Mapped[str] = mapped_column(Text)

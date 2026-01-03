@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.assistant.schemas import RagAssistantRequest, RagAssistantResponse
 from src.auth.dependencies import get_current_auth_user
-from src.database.database import session_dependency
+from src.database.session import session_dependency
 from src.database.models import User
 from src.documents import service as documents_service
 from src.assistant import service as assistant_service

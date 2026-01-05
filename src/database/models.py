@@ -37,17 +37,20 @@ class User(Base):
 
 
 class Document(Base):
+
     __tablename__ = "documents"
 
     title: Mapped[str] = mapped_column(String(255))
-    content: Mapped[str] = mapped_column(Text)
     content: Mapped[str] = mapped_column(Text, default="")
 
     s3_object_key: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     source_url: Mapped[str] = mapped_column(String(512), nullable=False)
     media_type: Mapped[str] = mapped_column(String(100), nullable=False)
 
-    chunks: Mapped[list["Chunk"]] = relationship(back_populates="document")
+    chunks: Mapped[list["Chunk"]] = relationship(
+        back_populates="document",
+        cascade="all, delete-orphan",
+    )
     user: Mapped["User"] = relationship(back_populates="documents")
 
     user_id: Mapped[int] = mapped_column(

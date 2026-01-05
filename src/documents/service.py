@@ -1,4 +1,4 @@
-from fastapi import UploadFile
+from fastapi import UploadFile, BackgroundTasks
 from fastapi.concurrency import run_in_threadpool
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -54,7 +54,7 @@ async def create_document(
         return document
 
     except Exception as e:
-        print(f"❌ DATABASE ERROR: {e}")
+        print(f"DATABASE ERROR: {e}")
         await run_in_threadpool(delete_file, s3_data["key"])
         raise DocumentUploadError() from e
 
@@ -70,6 +70,17 @@ async def update_document(
     return document
 
 
-async def delete_document(document: Document, session: AsyncSession) -> None:
+async def delete_document(
+    document: Document,
+    session: AsyncSession,
+    background_task: BackgroundTasks,
+) -> None:
+    file_key = document.s3_object_keys
+
     await session.delete(document)
     await session.commit()
+
+    background_task.add_task(
+        delete_file,
+        file_key,
+    )

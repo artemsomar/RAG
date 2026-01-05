@@ -35,13 +35,13 @@ async def get_document(
     return document
 
 
-@router.patch("/{document_id}/", response_model=DocumentSchema)
-async def update_document(
-    document_update: DocumentUpdate,
-    document: Document = Depends(get_document_by_id),
-    session: AsyncSession = Depends(session_dependency),
-):
-    return await documents_service.update_document(document, document_update, session)
+# @router.patch("/{document_id}/", response_model=DocumentSchema)
+# async def update_document(
+#     document_update: DocumentUpdate,
+#     document: Document = Depends(get_document_by_id),
+#     session: AsyncSession = Depends(session_dependency),
+# ):
+#     return await documents_service.update_document(document, document_update, session)
 
 
 @router.delete("/{document_id}/", status_code=status.HTTP_204_NO_CONTENT)

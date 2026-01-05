@@ -75,7 +75,7 @@ async def delete_document(
     session: AsyncSession,
     background_task: BackgroundTasks,
 ) -> None:
-    file_key = document.s3_object_keys
+    file_key = document.s3_object_key
 
     await session.delete(document)
     await session.commit()

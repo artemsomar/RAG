@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Depends, UploadFile, File
+from fastapi import APIRouter, status, Depends, UploadFile, File, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.documents.dependencies import get_document_by_id
 from src.database.session import session_dependency
@@ -46,7 +46,8 @@ async def get_document(
 
 @router.delete("/{document_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_document(
+    background_tasks: BackgroundTasks,
     document: Document = Depends(get_document_by_id),
     session: AsyncSession = Depends(session_dependency),
 ):
-    await documents_service.delete_document(document, session)
+    await documents_service.delete_document(document, session, background_tasks)

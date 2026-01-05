@@ -1,7 +1,7 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, status, Depends, UploadFile, File, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.documents.dependencies import get_document_by_id
-from src.database.database import session_dependency
+from src.database.session import session_dependency
 from src.documents import service as documents_service
 from src.documents.schemas import DocumentCreate, DocumentSchema, DocumentUpdate
 from src.database.models import Document, User
@@ -21,11 +21,11 @@ async def get_documents(
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model=DocumentSchema)
 async def create_document(
-    document_in: DocumentCreate,
+    file: UploadFile = File(...),
     user: User = Depends(get_current_auth_user),
     session: AsyncSession = Depends(session_dependency),
 ):
-    return await documents_service.create_document(document_in, user, session)
+    return await documents_service.create_document(file, user, session)
 
 
 @router.get("/{document_id}/", response_model=DocumentSchema)
@@ -35,18 +35,19 @@ async def get_document(
     return document
 
 
-@router.patch("/{document_id}/", response_model=DocumentSchema)
-async def update_document(
-    document_update: DocumentUpdate,
-    document: Document = Depends(get_document_by_id),
-    session: AsyncSession = Depends(session_dependency),
-):
-    return await documents_service.update_document(document, document_update, session)
+# @router.patch("/{document_id}/", response_model=DocumentSchema)
+# async def update_document(
+#     document_update: DocumentUpdate,
+#     document: Document = Depends(get_document_by_id),
+#     session: AsyncSession = Depends(session_dependency),
+# ):
+#     return await documents_service.update_document(document, document_update, session)
 
 
 @router.delete("/{document_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_document(
+    background_tasks: BackgroundTasks,
     document: Document = Depends(get_document_by_id),
     session: AsyncSession = Depends(session_dependency),
 ):
-    await documents_service.delete_document(document, session)
+    await documents_service.delete_document(document, session, background_tasks)

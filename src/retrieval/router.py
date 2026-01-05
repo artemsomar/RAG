@@ -4,7 +4,7 @@ from src.documents.service import get_user_documents
 from src.retrieval.schemas import RagResponse, RagRequest, ChunkInfo
 from src.retrieval.services import retrieval_service, chunks_service
 from src.auth.dependencies import get_current_auth_user
-from src.database.database import session_dependency
+from src.database.session import session_dependency
 from src.database.models import User
 
 

@@ -14,6 +14,10 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ./alembic:/app/alembic
+      - ./alembic.ini:/app/alembic.ini
 
   pg:
     image: postgres

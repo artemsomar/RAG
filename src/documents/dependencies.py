@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.dependencies import get_current_auth_user
 from src.database.models import Document, User
 from src.documents import service as documents_service
-from src.database.database import session_dependency
+from src.database.session import session_dependency
 
 
 async def get_document_by_id(

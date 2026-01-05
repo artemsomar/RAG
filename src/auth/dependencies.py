@@ -4,7 +4,7 @@ from jwt import InvalidTokenError
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.utils import decode_jwt
 from src.database.models import User
-from src.database.database import session_dependency
+from src.database.session import session_dependency
 from src.auth.services import auth_service
 
 http_bearer = HTTPBearer()
